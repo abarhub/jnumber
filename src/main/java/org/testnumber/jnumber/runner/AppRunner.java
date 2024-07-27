@@ -21,7 +21,35 @@ public class AppRunner implements ApplicationRunner {
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
-        test1();
+//        test1();
+//        test2();
+//        test3();
+//        test4();
+        test5();
+    }
+
+    private void test5() {
+        LOGGER.info("test5");
+
+        mathService.test5();
+    }
+
+    private void test4() {
+        LOGGER.info("test4");
+
+        mathService.test4();
+    }
+
+    private void test3() {
+        LOGGER.info("test3");
+
+        mathService.test2();
+    }
+
+    private void test2() {
+        LOGGER.info("test2");
+
+        mathService.test();
     }
 
     private void test1() {
