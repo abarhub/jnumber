@@ -232,7 +232,16 @@ public class MathService {
 
         LOGGER.info("Polynôme d'interpolation de Lagrange simplifie : {}", res);
 
-        listeFonctions();
+        var listeFonction=listeFonctions();
+
+        for(var liste:listeFonction){
+
+            LOGGER.info("fonction : {}", liste);
+
+            res=calculInterpolation(liste);
+
+            LOGGER.info("Polynôme d'interpolation de Lagrange simplifie : {}", res);
+        }
 
     }
 
@@ -248,31 +257,38 @@ public class MathService {
 //            }
 //        }
         List<Integer> function = new ArrayList<>(List.of(1, 2, 3));
-        enumerateBijectiveFunctions(function, 0);
+        enumerateBijectiveFunctions(function, 0, listeResultat);
+
+        LOGGER.info("res : {}", listeResultat);
 
         return listeResultat;
     }
 
-    private static void enumerateBijectiveFunctions(List<Integer> function, int start) {
+    private void enumerateBijectiveFunctions(List<Integer> function, int start, List<List<List<Integer>>> listeResultat) {
         if (start == function.size()) {
             printFunction(function);
+            List<List<Integer>> liste=new ArrayList<>();
+            for(int i=0;i<function.size();i++) {
+                liste.add(List.of(i+1,function.get(i)));
+            }
+            listeResultat.add(liste);
             return;
         }
 
         for (int i = start; i < function.size(); i++) {
             swap(function, start, i);
-            enumerateBijectiveFunctions(function, start + 1);
+            enumerateBijectiveFunctions(function, start + 1, listeResultat);
             swap(function, start, i);  // backtrack
         }
     }
 
-    private static void swap(List<Integer> array, int i, int j) {
+    private void swap(List<Integer> array, int i, int j) {
         int temp = array.get(i);
         array.set(i,array.get(j));
         array.set(j, temp);
     }
 
-    private static void printFunction(List<Integer> function) {
+    private void printFunction(List<Integer> function) {
         System.out.print("f: ");
         for (int i = 0; i < function.size(); i++) {
             System.out.print((i + 1) + " -> " + function.get(i));
