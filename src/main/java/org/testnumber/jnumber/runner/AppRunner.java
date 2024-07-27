@@ -27,11 +27,18 @@ public class AppRunner implements ApplicationRunner {
 //        test2();
 //        test3();
 //        test4();
-        test5();
+//        test5();
+        test6();
 
         LOGGER.info("fin");
 
         System.exit(0);
+    }
+
+    private void test6() {
+        LOGGER.info("test6");
+
+        mathService.test6();
     }
 
     private void test5() {

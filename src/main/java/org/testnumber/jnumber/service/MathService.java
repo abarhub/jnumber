@@ -9,9 +9,11 @@ import org.matheclipse.parser.client.SyntaxError;
 import org.matheclipse.parser.client.math.MathException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import org.testnumber.jnumber.math.Addition;
+import org.testnumber.jnumber.math.Fonction;
 import org.testnumber.jnumber.math.Multiplication;
 
 import java.util.ArrayList;
@@ -23,6 +25,9 @@ import java.util.Map;
 public class MathService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MathService.class);
+
+    @Autowired
+    private PermutationService permutationService;
 
     public void construit(Map<Integer, Integer> map) {
 
@@ -230,10 +235,10 @@ public class MathService {
     public void test5() {
 
         // Définir les points d'interpolation
-        List<List<Integer>> points = List.of(List.of(1, 1), List.of(2, 2), List.of(3, 3));
-        var res = calculInterpolation(points);
+//        List<List<Integer>> points = List.of(List.of(1, 1), List.of(2, 2), List.of(3, 3));
+//        var res = calculInterpolation(points);
 
-        LOGGER.info("Polynôme d'interpolation de Lagrange simplifie : {}", res);
+//        LOGGER.info("Polynôme d'interpolation de Lagrange simplifie : {}", res);
 
         var listeFonction = listeFonctions(3);
 
@@ -241,21 +246,65 @@ public class MathService {
 
             LOGGER.info("fonction : {}", liste);
 
-            res = calculInterpolation(liste);
+            var res = calculInterpolation(liste);
 
             LOGGER.info("Polynôme d'interpolation de Lagrange simplifie : {}", res);
         }
 
     }
 
-    public List<List<List<Integer>>> listeFonctions(int n) {
-        Assert.isTrue(n > 0, "n<=0");
-        List<List<List<Integer>>> listeResultat = new ArrayList<>();
+    public void test6() {
 
-        List<Integer> function = new ArrayList<>();
-        for (int i = 1; i <= n; i++) {
-            function.add(i);
+        // Définir les points d'interpolation
+//        List<List<Integer>> points = List.of(List.of(1, 1), List.of(2, 2), List.of(3, 3));
+//        var res = calculInterpolation(points);
+
+//        LOGGER.info("Polynôme d'interpolation de Lagrange simplifie : {}", res);
+
+
+
+        var listeFonction = listeFonctions(3);
+
+        Fonction f=new Fonction();
+        List<Fonction> liste2= new ArrayList<>();
+        liste2.add(f);
+        int no=0;
+        for(var tmp:listeFonction){
+            var maxOpt=f.getKeys().stream().max(Integer::compareTo);
+            if(maxOpt.isEmpty()){
+                no=0;
+            } else {
+                no=maxOpt.get();
+            }
+            for(int key:tmp.getKeys()){
+                f.set(key+no,tmp.get(key));
+            }
+//            if(liste2.isEmpty()){
+//                //liste2.add(tmp);
+//                //for()
+//            } else {
+////                for(var tmp2:tmp){
+////
+////                }
+//            }
         }
+
+        for (var liste : liste2) {
+
+            LOGGER.info("fonction : {}", liste);
+
+            var res = calculInterpolation(liste);
+
+            LOGGER.info("Polynôme d'interpolation de Lagrange simplifie : {}", res);
+        }
+
+    }
+
+    public List<Fonction> listeFonctions(int n) {
+        Assert.isTrue(n > 0, "n<=0");
+        List<Fonction> listeResultat = new ArrayList<>();
+
+        List<Integer> function = getList(n);
         enumerateBijectiveFunctions(function, 0, listeResultat);
 
         LOGGER.info("res : {}", listeResultat);
@@ -263,14 +312,24 @@ public class MathService {
         return listeResultat;
     }
 
-    private void enumerateBijectiveFunctions(List<Integer> function, int start, List<List<List<Integer>>> listeResultat) {
+    private List<Integer> getList(int max){
+        List<Integer> liste = new ArrayList<>();
+        for (int i = 1; i <= max; i++) {
+            liste.add(i);
+        }
+        return liste;
+    }
+
+    private void enumerateBijectiveFunctions(List<Integer> function, int start, List<Fonction> listeResultat) {
         if (start == function.size()) {
             printFunction(function);
-            List<List<Integer>> liste = new ArrayList<>();
+            Fonction fonction=new Fonction();
+//            List<List<Integer>> liste = new ArrayList<>();
             for (int i = 0; i < function.size(); i++) {
-                liste.add(List.of(i + 1, function.get(i)));
+//                liste.add(List.of(i + 1, function.get(i)));
+                fonction.set(i+1,function.get(i));
             }
-            listeResultat.add(liste);
+            listeResultat.add(fonction);
             return;
         }
 
@@ -298,15 +357,15 @@ public class MathService {
         System.out.println();
     }
 
-    public IExpr calculInterpolation(List<List<Integer>> points) {
+    public IExpr calculInterpolation(Fonction points) {
 
         ExprEvaluator util = new ExprEvaluator();
 
         // Créer une liste de points pour Symja
 //        IExpr pointsList = F.List();
         String s = "";
-        for (List<Integer> point : points) {
-            Assert.isTrue(point.size() == 2, " la taille n'est pas bonne");
+        for (Integer point : points.getKeys()) {
+            //Assert.isTrue(point.size() == 2, " la taille n'est pas bonne");
 //            if (pointsList.isEmpty()) {
 //                pointsList = F.List(F.List(F.num(point[0]), F.num(point[1])));
 //            } else {
@@ -318,7 +377,7 @@ public class MathService {
             if (!s.isEmpty()) {
                 s += ",";
             }
-            s += "{" + point.get(0) + "," + point.get(1) + "}";
+            s += "{" + point + "," + points.get(point) + "}";
         }
 
 //        LOGGER.info("Liste des points : {}", pointsList);
