@@ -21,11 +21,17 @@ public class AppRunner implements ApplicationRunner {
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
+        LOGGER.info("Running AppRunner");
+
 //        test1();
 //        test2();
 //        test3();
 //        test4();
         test5();
+
+        LOGGER.info("fin");
+
+        System.exit(0);
     }
 
     private void test5() {
