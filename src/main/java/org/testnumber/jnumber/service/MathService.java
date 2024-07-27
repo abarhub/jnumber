@@ -10,13 +10,11 @@ import org.matheclipse.parser.client.math.MathException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.util.Assert;
 import org.testnumber.jnumber.math.Addition;
 import org.testnumber.jnumber.math.Multiplication;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class MathService {
@@ -229,21 +227,71 @@ public class MathService {
     public void test5(){
 
         // Définir les points d'interpolation
-        int[][] points = {{1, 1}, {2, 2}, {3, 3}};
+        List<List<Integer>> points = List.of(List.of(1, 1), List.of(2, 2), List.of(3, 3));
         var res=calculInterpolation(points);
 
         LOGGER.info("Polynôme d'interpolation de Lagrange simplifie : {}", res);
 
+        listeFonctions();
+
     }
 
-    public IExpr calculInterpolation(int[][] points){
+    public List<List<List<Integer>>> listeFonctions() {
+        List<List<List<Integer>>> listeResultat=new ArrayList<>();
+
+        int N=3;
+
+//        Map<Integer,Integer> map=new TreeMap<>();
+//        for(int i=1;i<=3;i++){
+//            for(int j=1;j<=N;j++){
+//                if()
+//            }
+//        }
+        List<Integer> function = new ArrayList<>(List.of(1, 2, 3));
+        enumerateBijectiveFunctions(function, 0);
+
+        return listeResultat;
+    }
+
+    private static void enumerateBijectiveFunctions(List<Integer> function, int start) {
+        if (start == function.size()) {
+            printFunction(function);
+            return;
+        }
+
+        for (int i = start; i < function.size(); i++) {
+            swap(function, start, i);
+            enumerateBijectiveFunctions(function, start + 1);
+            swap(function, start, i);  // backtrack
+        }
+    }
+
+    private static void swap(List<Integer> array, int i, int j) {
+        int temp = array.get(i);
+        array.set(i,array.get(j));
+        array.set(j, temp);
+    }
+
+    private static void printFunction(List<Integer> function) {
+        System.out.print("f: ");
+        for (int i = 0; i < function.size(); i++) {
+            System.out.print((i + 1) + " -> " + function.get(i));
+            if (i < function.size() - 1) {
+                System.out.print(", ");
+            }
+        }
+        System.out.println();
+    }
+
+    public IExpr calculInterpolation(List<List<Integer>> points){
 
         ExprEvaluator util = new ExprEvaluator();
 
         // Créer une liste de points pour Symja
 //        IExpr pointsList = F.List();
         String s="";
-        for (int[] point : points) {
+        for (List<Integer> point : points) {
+            Assert.isTrue(point.size()==2," la taille n'est pas bonne");
 //            if (pointsList.isEmpty()) {
 //                pointsList = F.List(F.List(F.num(point[0]), F.num(point[1])));
 //            } else {
@@ -255,7 +303,7 @@ public class MathService {
             if(!s.isEmpty()){
                 s+=",";
             }
-            s+="{"+point[0]+","+point[1]+"}";
+            s+="{"+point.get(0)+","+point.get(1)+"}";
         }
 
 //        LOGGER.info("Liste des points : {}", pointsList);
